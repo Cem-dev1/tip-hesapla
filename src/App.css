@@ -1,0 +1,397 @@
+/* Sayfa genel sıfırlama */
+#root, body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* Dışarı taşmayı engelle */
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 90vh; /* Tam ekran yüksekliği */
+  width: 100vw;
+  background-color: #000000;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: rgb(0, 0, 0);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  height: 60px; /* Sabit başlık yüksekliği */
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  text-transform: capitalize;
+}
+
+.header button {
+  padding: 10px 20px;
+  border: none;
+  background: #007bff;
+  color: white;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+/* Esnek Grid Yapısı */
+.grid-takvim {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Yan yana 2 kutu */
+  grid-template-rows: repeat(4, 1fr);    /* Alt alta 4 satır */
+  gap: 8px;
+  padding: 8px;
+  flex-grow: 1; /* Kalan tüm boşluğu doldur */
+}
+
+.gun-kutu {
+  background: rgb(185, 165, 246);
+  border: 1px solid #eee;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.1s;
+}
+
+.gun-kutu:active {
+  transform: scale(0.98);
+  background: #f0f0f0;
+}
+
+/* 7. Günün (Pazar) tek başına tüm alt satırı kaplaması */
+.gun-kutu:last-child {
+  grid-column: span 2;
+}
+
+.gun-adi {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.gun-sayi {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #222;
+}
+
+/* Hafta sonu için hafif renk farkı */
+.gun-kutu:nth-child(6), .gun-kutu:nth-child(7) {
+  background-color: #fff5f5;
+}
+/* Arka plan karartma */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px); /* Arkayı hafif bulanıklaştırır, çok şık durur */
+  display: flex;
+  align-items: flex-end; /* İçeriği en alta yaslar */
+  z-index: 1000;
+}
+
+/* Alttan açılan panel */
+.modal-icerik {
+  background: rgb(0, 0, 0);
+  width: 100%;
+  height: 50vh; /* Ekranın tam yarısı */
+  border-radius: 25px 25px 0 0; /* Sadece üst köşeler oval */
+  padding: 25px;
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+  animation: slideUp 0.3s ease-out; /* Aşağıdan yukarı kayma efekti */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Panel üzerindeki küçük tutma çizgisi (Handle) */
+.modal-icerik::before {
+  content: "";
+  width: 40px;
+  height: 5px;
+  background: #ddd;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-icerik h3 {
+  font-size: 1.4rem;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.modal-icerik p {
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+
+.modal-icerik input {
+  width: 100%;
+  max-width: 300px;
+  padding: 15px;
+  border: 2px solid #f0f0f0;
+  border-radius: 15px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  outline: none;
+  color: #333;
+  background: #f9f9f9;
+}
+
+.modal-icerik input:focus {
+  border-color: #007bff;
+  background: white;
+}
+
+.modal-butonlar {
+  display: flex;
+  width: 100%;
+  max-width: 300px;
+  gap: 15px;
+  margin-top: auto; /* Butonları en alta iter */
+  padding-bottom: 20px;
+}
+
+.modal-butonlar button {
+  flex: 1;
+  padding: 15px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.kaydet { background: #007bff; color: white; }
+.iptal { background: #f0f0f0; color: #555; }
+
+.gun-tutar {
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #00ff88; /* Canlı yeşil, siyah üzerinde çok iyi durur */
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+/* Geçmiş günlerde tutar daha sönük olsun */
+.gecmis-gun .gun-tutar {
+  color: #000000;
+  background: transparent;
+  border-color: #333;
+}
+/* Alt Buton Alanı */
+.footer-action {
+  padding: 15px;
+  background: #000;
+  border-top: 1px solid #222;
+  position: sticky;
+  bottom: 0;
+}
+
+.havuz-ac-btn {
+  width: 100%;
+  padding: 16px;
+  background: #ffffff;
+  color: #000;
+  border: none;
+  border-radius: 15px;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255,255,255,0.1);
+}
+
+/* Havuz Modalı Özel Stilleri */
+.havuz-modal {
+  height: 70vh !important; /* Rapor daha uzun olduğu için biraz daha yukarı çıksın */
+}
+
+.havuz-toplam-kart {
+  background: #1a1a1a;
+  width: 100%;
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+  border: 1px solid #333;
+}
+
+.havuz-toplam-kart h2 {
+  color: #00ff88;
+  font-size: 2.5rem;
+  margin: 10px 0 0 0;
+}
+
+.personel-listesi-scroll {
+  width: 100%;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.personel-kart {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #111;
+  padding: 15px;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  border: 1px solid #222;
+}
+
+.p-bilgi {
+  display: flex;
+  flex-direction: column;
+}
+
+.p-isim {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.p-puan {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.p-pay {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.kapat-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+}
+.havuz-ozet-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.ozet-kart {
+  background: #111;
+  padding: 15px;
+  border-radius: 15px;
+  text-align: center;
+  border: 1px solid #222;
+}
+
+.ozet-kart.mutfak {
+  border-color: #ff4d4d; /* Mutfak payı için hafif kırmızı/turuncu uyarı tonu */
+}
+
+.ozet-kart p {
+  margin: 5px 0 0 0;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+.dagitilacak-bilgi {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.tarih-araligi-label {
+  display: block;
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+/* Footer Ana Taşıyıcı */
+.user-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 65px;
+  background: rgba(20, 20, 20, 0.8); /* Hafif şeffaf koyu arka plan */
+  backdrop-filter: blur(10px); /* Arkayı bulanıklaştırma efekti */
+  border-top: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 25px;
+  z-index: 100;
+}
+
+/* Çıkış Butonu */
+.logout-btn {
+  background: rgba(255, 77, 77, 0.1);
+  color: #ff4d4d;
+  border: 1px solid rgba(255, 77, 77, 0.2);
+  padding: 8px 15px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.logout-btn:active {
+  transform: scale(0.95);
+  background: rgba(255, 77, 77, 0.2);
+}
+
+/* Kullanıcı Bilgisi Alanı */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-name {
+  color: #fff;
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+}
+
+/* Aktiflik Noktası */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #00ff88;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #00ff88;
+}
+
+/* Takvimin footer altında kalmaması için container'a padding ekle */
+.container {
+  padding-bottom: 80px; 
+}
