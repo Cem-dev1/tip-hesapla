@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from './supbaseClient';
-import './Auth.css';
+import './auth.css';
 
 function Auth({ onLogin }) {
   const [pin, setPin] = useState("");
